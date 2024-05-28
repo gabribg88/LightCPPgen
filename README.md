@@ -4,9 +4,8 @@ This github repository contains the Python code to reproduce the results of the 
 
 This paper has been submitted for publication in *Nature communications*.
 
-<img src="figures/Mutation_matrix.pdf" width="500">
+<img src="figures/Mutation_matrix.png" width="1000">
 
-![License Badge](https://img.shields.io/badge/license-MIT-blue)
 
 ## Abstract
 Common regularization algorithms for linear regression, such as LASSO and Ridge regression, rely on a regularization hyperparameter that balances the tradeoff between minimizing the fitting error and the norm of the model coefficients. As this hyperparameter is scalar, it can be easily  selected via random or grid search optimizing a cross-validation criterion. However, using a scalar hyperparameter limits the algorithm's degrees of freedom. In this paper, we address the problem of linear regression with  $\ell_2$-regularization, where a different regularization hyperparameter is associated with each input variable. We optimize these hyperparameters using a gradient-based approach, wherein the gradient of a cross-validation criterion with respect to the regularization hyperparameters is computed analytically through matrix differential calculus. Additionally, we introduce two strategies tailored for sparse model learning problems aiming at reducing the risk of overfitting to the validation data. Numerical examples demonstrate that our multi-hyperparameter regularization approach outperforms LASSO, Ridge, and Elastic Net regression. Moreover, the analytical computation of the gradient proves to be more efficient in terms of computational time compared to automatic differentiation, especially when handling a large number of input variables. Application to the identification of over-parameterized Linear Parameter-Varying models is also presented.
