@@ -4,7 +4,7 @@ This github repository contains the Python code to reproduce the results of the 
 
 This paper has been submitted for publication in *Nature communications*.
 
-<img src="figures/Mutation_matrix.png" width="1000">
+<img src="figures/Figure3.png" width="1000">
 
 
 ## Abstract
