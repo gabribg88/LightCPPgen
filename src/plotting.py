@@ -5,6 +5,130 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import AxesGrid
 from typing import Tuple
 
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+
+def create_model_performance_summary(results):
+    """
+    Create a bar chart comparing model performance across key metrics
+    
+    Parameters:
+    results (dict): Dictionary containing HPOResult objects
+    """
+    model_name_mapping = {
+        'knn': 'K-Nearest Neighbors',
+        'logistic_l2': 'Logistic Regression (L2)',
+        'logistic_l1': 'Logistic Regression (L1)',
+        'svm': 'Support Vector Machine',
+        'mlp': 'Multi-Layer Perceptron',
+        'random_forest': 'Random Forest',
+        'lightgbm': 'LightGBM',
+        'histgb': 'Histogram Gradient Boosting',
+        'xgboost': 'XGBoost'
+    }
+    
+    metric_name_mapping = {
+        'roc_auc': 'AUC-ROC',
+        'accuracy': 'Accuracy',
+        'sensitivity': 'Sensitivity',
+        'specificity': 'Specificity',
+        'matthews_corrcoef': 'MCC'
+    }
+    
+    summary_metrics = ['roc_auc', 'accuracy', 'sensitivity', 'specificity', 'matthews_corrcoef']
+    summary_data = {}
+    
+    for model_key, result in results.items():
+        model_name = model_name_mapping.get(model_key, model_key)
+        summary_data[model_name] = []
+        for metric in summary_metrics:
+            test_metric_key = f'test_{metric}'
+            if test_metric_key in result.cv_scores:
+                mean_score = np.mean(result.cv_scores[test_metric_key])
+                summary_data[model_name].append(mean_score)
+            else:
+                summary_data[model_name].append(0)
+    
+    summary_df = pd.DataFrame(summary_data, index=[metric_name_mapping[m] for m in summary_metrics])
+    
+    model_avg_scores = summary_df.mean(axis=0).sort_values(ascending=False)
+    summary_df = summary_df[model_avg_scores.index]
+    
+    fig, ax = plt.subplots(figsize=(14, 8))
+    
+    n_models = len(summary_df.columns)
+    colors = plt.cm.viridis(np.linspace(0.8, 0.2, n_models))
+    
+    x = np.arange(len(summary_df.index))
+    width = 0.09  # Width of individual bars
+    
+    for i, (model, color) in enumerate(zip(summary_df.columns, colors)):
+        offset = (i - n_models/2 + 0.5) * width
+        bars = ax.bar(x + offset, summary_df[model], width, 
+                       label=model, color=color, alpha=0.8, edgecolor='black', linewidth=0.5)
+        
+        for j, bar in enumerate(bars):
+            height = bar.get_height()
+            if height > 0.1:  # Only label bars with meaningful values
+                ax.text(bar.get_x() + bar.get_width()/2., height + 0.005,
+                       f'{height:.3f}', ha='center', va='bottom', fontsize=8, rotation=90)
+    
+    ax.set_xlabel('Performance Metrics', fontsize=14)#, fontweight='bold')
+    ax.set_ylabel('Score', fontsize=14)#, fontweight='bold')
+    #ax.set_title('Model Performance Comparison Across Key Metrics', fontsize=16, fontweight='bold', pad=20)
+    
+    ax.set_xticks(x)
+    ax.set_xticklabels(summary_df.index, fontsize=12)
+    ax.set_ylim(0, 1.05)
+    ax.set_yticks(np.arange(0, 1.1, 0.1))
+    ax.yaxis.grid(True, alpha=0.3, linestyle='--')
+    
+    # ax.axhline(y=0.9, color='green', linestyle='--', alpha=0.3, linewidth=1)
+    # ax.axhline(y=0.8, color='orange', linestyle='--', alpha=0.3, linewidth=1)
+    # ax.axhline(y=0.7, color='red', linestyle='--', alpha=0.3, linewidth=1)
+    # ax.text(len(x)-0.5, 0.91, 'Excellent', fontsize=8, color='green', alpha=0.5)
+    # ax.text(len(x)-0.5, 0.81, 'Good', fontsize=8, color='orange', alpha=0.5)
+    # ax.text(len(x)-0.5, 0.71, 'Fair', fontsize=8, color='red', alpha=0.5)
+    
+    ax.legend(loc='center left', bbox_to_anchor=(1, 0.5), fontsize=10, 
+              frameon=True, fancybox=True, shadow=True)
+    
+    # ax.spines['top'].set_visible(False)
+    # ax.spines['right'].set_visible(False)
+    
+    plt.tight_layout()
+
+    ax.grid(False)
+    return fig, ax
+
+def create_results_table(results):
+    """
+    Create a summary DataFrame of all HPO results
+    """
+    summary_data = []
+    
+    for model_key, result in results.items():
+        row = {
+            'Model': result.model_name,
+            'Best MCC': f"{result.best_score:.4f}",
+            'Search Time (s)': f"{result.search_time:.2f}"
+        }
+        
+        for metric in ['roc_auc', 'accuracy', 'sensitivity', 'specificity', 'matthews_corrcoef']:
+            test_metric_key = f'test_{metric}'
+            if test_metric_key in result.cv_scores:
+                mean_score = np.mean(result.cv_scores[test_metric_key])
+                std_score = np.std(result.cv_scores[test_metric_key])
+                row[f'CV {metric.replace("_", " ").title()}'] = f"{mean_score:.3f} ± {std_score:.3f}"
+        
+        summary_data.append(row)
+    
+    summary_df = pd.DataFrame(summary_data)
+    summary_df = summary_df.sort_values('Best MCC', ascending=False)
+    
+    return summary_df
+
 ### Function for asymmetric color map taken from:
 ### https://stackoverflow.com/questions/7404116/defining-the-midpoint-of-a-colormap-in-matplotlib
 def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
