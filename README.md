@@ -2,7 +2,7 @@
 
 This github repository contains the Python code to reproduce the results of the paper: *LightCPPgen: An Explainable Machine Learning Pipeline for Rational Design of Cell Penetrating Peptides* by Gabriele Maroni, Filip Stojceski, Lorenzo Pallante, Marco A. Deriu, Dario Piga, Gianvito Grasso.
 
-This paper has been submitted for publication in *Nature communications*.
+This paper has been published in *International Journal of Antimicrobial Agents* ([https://doi.org/10.1016/j.ijantimicag.2025.107611](https://doi.org/10.1016/j.ijantimicag.2025.107611)).
 
 <img src="figures/Figure3.png" width="1000">
 
