@@ -8,11 +8,6 @@ The repository contains the MLCPP2.0 data used in the paper, notebooks for repro
 
 <img src="figures/LightCPPgen.png" width="1000">
 
-## Documentation
-
-- [Pretrained Optimizer Mode](docs/PRETRAINED_OPTIMIZER.md): score and optimize peptide sequences with the published 20-feature LightCPPgen model.
-- [Custom Dataset Pipeline Mode](docs/CUSTOM_DATASET_PIPELINE.md): adapt the LightCPPgen pipeline to a new CPP/non-CPP dataset.
-
 ## Repository Modes
 
 The code can be used in three different ways.
