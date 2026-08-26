@@ -6,7 +6,7 @@ LightCPPgen is an explainable machine-learning pipeline for the rational design 
 
 The repository contains the MLCPP2.0 data used in the paper, notebooks for reproducing the analyses, source modules for feature engineering, model training, interpretation and optimization, and the published 20-feature LightGBM model.
 
-<img src="figures/Figure3.png" width="1000">
+<img src="figures/LightCPPgen.png" width="1000">
 
 ## Repository Modes
 
