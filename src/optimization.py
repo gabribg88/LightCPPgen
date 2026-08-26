@@ -40,6 +40,54 @@ class Featurizer():
                               'PAAC_Xc1.G',
                               'CKSAAGP_uncharger.aromatic.gap9'
                              ]
+        self._paac_cache = {}
+        self._grantham_cache = None
+
+    def _load_paac_properties(self, include_last=True):
+        if include_last in self._paac_cache:
+            return self._paac_cache[include_last]
+
+        dataFile = os.path.join(self.data_folder, 'PAAC.txt')
+        with open(dataFile) as f:
+            records = f.readlines()
+        AA = ''.join(records[0].rstrip().split()[1:])
+        AADict = {}
+        for i in range(len(AA)):
+            AADict[AA[i]] = i
+        AAProperty = []
+        last = len(records) if include_last else len(records) - 1
+        for i in range(1, last):
+            array = records[i].rstrip().split() if records[i].rstrip() != '' else None
+            AAProperty.append([float(j) for j in array[1:]])
+        AAProperty1 = []
+        for i in AAProperty:
+            meanI = sum(i) / 20
+            fenmu = math.sqrt(sum([(j - meanI) ** 2 for j in i]) / 20)
+            AAProperty1.append([(j - meanI) / fenmu for j in i])
+
+        self._paac_cache[include_last] = (AA, AADict, AAProperty1)
+        return self._paac_cache[include_last]
+
+    def _load_grantham_distance(self):
+        if self._grantham_cache is not None:
+            return self._grantham_cache
+
+        dataFile1 = os.path.join(self.data_folder, 'Grantham.txt')
+        AA1 = 'ARNDCQEGHILKMFPSTWYV'
+        DictAA1 = {}
+        for i in range(len(AA1)):
+            DictAA1[AA1[i]] = i
+
+        with open(dataFile1) as f:
+            records = f.readlines()[1:]
+        AADistance1 = []
+        for i in records:
+            array = i.rstrip().split()[1:] if i.rstrip() != '' else None
+            AADistance1.append(array)
+
+        AADistance1 = np.array([float(AADistance1[i][j]) for i in range(len(AADistance1)) for j in range(len(AADistance1[i]))]).reshape((20, 20))
+        self._grantham_cache = (DictAA1, AADistance1)
+        return self._grantham_cache
         
     def Count(self, seq1, seq2):
         sum = 0
@@ -130,24 +178,7 @@ class Featurizer():
         
         lambdaValue = 1
         w = 0.05
-        dataFile = os.path.join(self.data_folder, 'PAAC.txt')
-        with open(dataFile) as f:
-            records = f.readlines()
-        AA = ''.join(records[0].rstrip().split()[1:])
-        AADict = {}
-        for i in range(len(AA)):
-            AADict[AA[i]] = i
-        AAProperty = []
-        AAPropertyNames = []
-        for i in range(1, len(records)):
-            array = records[i].rstrip().split() if records[i].rstrip() != '' else None
-            AAProperty.append([float(j) for j in array[1:]])
-            AAPropertyNames.append(array[0])
-        AAProperty1 = []
-        for i in AAProperty:
-            meanI = sum(i) / 20
-            fenmu = math.sqrt(sum([(j - meanI) ** 2 for j in i]) / 20)
-            AAProperty1.append([(j - meanI) / fenmu for j in i])
+        AA, AADict, AAProperty1 = self._load_paac_properties(include_last=True)
 
         theta = []
         for n in range(1, lambdaValue + 1):
@@ -161,24 +192,7 @@ class Featurizer():
     def compute_APAAC_Pc2_Hydrophobicity_1(self, sequence):
         lambdaValue = 1
         w = 0.05           
-        dataFile = os.path.join(self.data_folder, 'PAAC.txt')
-        with open(dataFile) as f:
-            records = f.readlines()
-        AA = ''.join(records[0].rstrip().split()[1:])
-        AADict = {}
-        for i in range(len(AA)):
-            AADict[AA[i]] = i
-        AAProperty = []
-        AAPropertyNames = []
-        for i in range(1, len(records) - 1):
-            array = records[i].rstrip().split() if records[i].rstrip() != '' else None
-            AAProperty.append([float(j) for j in array[1:]])
-            AAPropertyNames.append(array[0])
-        AAProperty1 = []
-        for i in AAProperty:
-            meanI = sum(i) / 20
-            fenmu = math.sqrt(sum([(j - meanI) ** 2 for j in i]) / 20)
-            AAProperty1.append([(j - meanI) / fenmu for j in i])
+        AA, AADict, AAProperty1 = self._load_paac_properties(include_last=False)
 
         theta = []
         for n in range(1, lambdaValue + 1):
@@ -226,24 +240,7 @@ class Featurizer():
     def compute_APAAC_Pc1_A(self, sequence):
         lambdaValue = 1
         w = 0.05
-        dataFile = os.path.join(self.data_folder, 'PAAC.txt')
-        with open(dataFile) as f:
-            records = f.readlines()
-        AA = ''.join(records[0].rstrip().split()[1:])
-        AADict = {}
-        for i in range(len(AA)):
-            AADict[AA[i]] = i
-        AAProperty = []
-        AAPropertyNames = []
-        for i in range(1, len(records) - 1):
-            array = records[i].rstrip().split() if records[i].rstrip() != '' else None
-            AAProperty.append([float(j) for j in array[1:]])
-            AAPropertyNames.append(array[0])
-        AAProperty1 = []
-        for i in AAProperty:
-            meanI = sum(i) / 20
-            fenmu = math.sqrt(sum([(j - meanI) ** 2 for j in i]) / 20)
-            AAProperty1.append([(j - meanI) / fenmu for j in i])
+        AA, AADict, AAProperty1 = self._load_paac_properties(include_last=False)
         theta = []
         for n in range(1, lambdaValue + 1):
             for j in range(len(AAProperty1)):
@@ -359,24 +356,7 @@ class Featurizer():
     def compute_QSOrder_Grantham_Xr_T(self, sequence):
         nlag = 3
         w = 0.05       
-        dataFile1 = os.path.join(os.path.join('..','data', 'Grantham.txt'))
-        AA = 'ACDEFGHIKLMNPQRSTVWY'
-        AA1 = 'ARNDCQEGHILKMFPSTWYV'
-        DictAA = {}
-        for i in range(len(AA)):
-            DictAA[AA[i]] = i
-        DictAA1 = {}
-        for i in range(len(AA1)):
-            DictAA1[AA1[i]] = i
-
-        with open(dataFile1) as f:
-            records = f.readlines()[1:]
-        AADistance1 = []
-        for i in records:
-            array = i.rstrip().split()[1:] if i.rstrip() != '' else None
-            AADistance1.append(array)
-
-        AADistance1 = np.array([float(AADistance1[i][j]) for i in range(len(AADistance1)) for j in range(len(AADistance1[i]))]).reshape((20, 20))
+        DictAA1, AADistance1 = self._load_grantham_distance()
 
         arrayGM = []
         for n in range(1, nlag + 1):
@@ -423,24 +403,7 @@ class Featurizer():
 
         lambdaValue = 1
         w = 0.05
-        dataFile = os.path.join(self.data_folder, 'PAAC.txt')
-        with open(dataFile) as f:
-            records = f.readlines()
-        AA = ''.join(records[0].rstrip().split()[1:])
-        AADict = {}
-        for i in range(len(AA)):
-            AADict[AA[i]] = i
-        AAProperty = []
-        AAPropertyNames = []
-        for i in range(1, len(records)):
-            array = records[i].rstrip().split() if records[i].rstrip() != '' else None
-            AAProperty.append([float(j) for j in array[1:]])
-            AAPropertyNames.append(array[0])
-        AAProperty1 = []
-        for i in AAProperty:
-            meanI = sum(i) / 20
-            fenmu = math.sqrt(sum([(j - meanI) ** 2 for j in i]) / 20)
-            AAProperty1.append([(j - meanI) / fenmu for j in i])
+        AA, AADict, AAProperty1 = self._load_paac_properties(include_last=True)
 
         theta = []
         for n in range(1, lambdaValue + 1):

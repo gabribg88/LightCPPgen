@@ -8,6 +8,11 @@ The repository contains the MLCPP2.0 data used in the paper, notebooks for repro
 
 <img src="figures/LightCPPgen.png" width="1000">
 
+## Documentation
+
+- [Pretrained Optimizer Mode](docs/PRETRAINED_OPTIMIZER.md): score and optimize peptide sequences with the published 20-feature LightCPPgen model.
+- [Custom Dataset Pipeline Mode](docs/CUSTOM_DATASET_PIPELINE.md): adapt the LightCPPgen pipeline to a new CPP/non-CPP dataset.
+
 ## Repository Modes
 
 The code can be used in three different ways.
@@ -38,11 +43,29 @@ Use the same pipeline on a different CPP/non-CPP dataset. A custom dataset must 
 
 Important limitation: the current fast optimizer `Featurizer` in `src/optimization.py` is coupled to the 20 selected features used by the published LightCPPgen model. If a newly trained model selects different features, the optimizer is only valid if those features can also be computed for candidate sequences by a compatible featurizer.
 
+See [Custom Dataset Pipeline Mode](docs/CUSTOM_DATASET_PIPELINE.md) for the current custom-dataset workflow and compatibility notes.
+
 ### 3. Pretrained Optimizer
 
 Use the published 20-feature LightGBM model in `models/LightCPP_20.pickle` directly on sequences of interest. This mode avoids the full descriptor pipeline and uses the fast 20-feature `Featurizer` implemented in `src/optimization.py`.
 
 This is the simplest mode for users who want to score or optimize peptide sequences without retraining the model.
+
+See [Pretrained Optimizer Mode](docs/PRETRAINED_OPTIMIZER.md) for full usage instructions.
+
+The pretrained optimizer has a lighter dependency file:
+
+```bash
+conda create -n lightcppgen-optimizer python=3.9
+conda activate lightcppgen-optimizer
+pip install -r requirements-optimizer.txt
+```
+
+For the exact tested lightweight environment:
+
+```bash
+pip install -r requirements-optimizer-pinned.txt
+```
 
 ## Repository Layout
 
@@ -53,6 +76,7 @@ figures/    Paper figures and generated plots
 models/     Published trained model and model placeholders
 notebooks/  Reproduction notebooks
 results/    Generated analysis and optimization outputs
+docs/       Usage guides for repository workflows
 scripts/    Utility scripts
 src/        Source code used by the notebooks
 ```
@@ -74,6 +98,60 @@ python scripts/check_paper_inputs.py
 ```
 
 The script verifies that the expected input data, notebooks, folders and pretrained model are present before running the expensive notebooks.
+
+## Using the Pretrained Optimizer
+
+The script `scripts/lightcppgen_optimizer.py` provides a command-line interface for the published 20-feature model.
+
+Score one or more sequences:
+
+```bash
+python scripts/lightcppgen_optimizer.py score \
+  --sequences GEPWKVCVN LDPIVAKRVRHILTENARTVEA \
+  --output results/scored_sequences.csv
+```
+
+Score sequences from a FASTA file:
+
+```bash
+python scripts/lightcppgen_optimizer.py score \
+  --input data/MLCPP2_Test_optimized.fasta \
+  --output results/scored_sequences.csv
+```
+
+Score sequences from a CSV file containing a `Sequence` column:
+
+```bash
+python scripts/lightcppgen_optimizer.py score \
+  --input peptides.csv \
+  --sequence-column Sequence \
+  --id-column ID \
+  --output results/scored_sequences.csv
+```
+
+Run the genetic optimizer on one or more input sequences:
+
+```bash
+python scripts/lightcppgen_optimizer.py optimize \
+  --sequences GEPWKVCVN \
+  --population-size 500 \
+  --max-iter 50 \
+  --output results/optimized_sequences.csv
+```
+
+For quick tests, use smaller values:
+
+```bash
+python scripts/lightcppgen_optimizer.py optimize \
+  --sequences GEPWKVCVN \
+  --population-size 50 \
+  --max-iter 5 \
+  --output results/optimized_sequences_quick_test.csv
+```
+
+The optimizer output includes the input sequence, initial penetration score, initial anomaly score, optimized sequence, optimized penetration score, optimized anomaly score, fitness, number of changed residues, number of generations and stopping reason.
+
+By default, anomaly scores are computed by fitting a `LocalOutlierFactor` model on the bundled MLCPP2.0 training sequences after applying the same 20-feature featurizer. This keeps pretrained optimization independent of the generated `features/comb_*.pickle` files.
 
 ## Reproducing the Paper Results
 
