@@ -29,11 +29,17 @@ def evaluate_candidate(train,
                        num_folds,
                        num_repeats,
                        params,
-                       seed,
                        threshold,
                        refit_multiplier,
                        train_score,
-                       scoring):
+                       scoring,
+                       seed=35,
+                       refit=True,
+                       train_importances=False,
+                       valid_importances=False,
+                       test_importances=False,
+                       verbose=False
+                      ):
     features = selected_features + [candidate]
     results = cross_validate(train=train,
                              test=test,
@@ -43,14 +49,14 @@ def evaluate_candidate(train,
                              num_repeats=num_repeats,
                              params=params,
                              threshold=threshold,
-                             seed=35,
-                             refit=True,
+                             seed=seed,
+                             refit=refit,
                              refit_multiplier=refit_multiplier,
                              train_score=train_score,
-                             train_importances=False,
-                             valid_importances=False,
-                             test_importances=False,
-                             verbose=False)
+                             train_importances=train_importances,
+                             valid_importances=valid_importances,
+                             test_importances=test_importances,
+                             verbose=verbose)
     score_df = print_results(results, display_metrics=False, return_metrics=True)
     train_score, valid_score, test_enseble_score, test_refit_score = score_df.loc[['Train', 'Valid', 'Test_ensemble', 'Test_refit'], scoring].values
     return candidate, train_score, valid_score, test_enseble_score, test_refit_score
