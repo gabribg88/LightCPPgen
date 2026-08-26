@@ -21,18 +21,12 @@ The full feature-engineering pipeline is not required.
 
 ## Installation
 
-Create a lightweight environment:
+Create the environment:
 
 ```bash
-conda create -n lightcppgen-optimizer python=3.9
+conda create -n lightcppgen-optimizer
 conda activate lightcppgen-optimizer
 pip install -r requirements-optimizer.txt
-```
-
-The default optimizer requirements are intentionally flexible. If you need the exact tested versions, use:
-
-```bash
-pip install -r requirements-optimizer-pinned.txt
 ```
 
 ## Quick Test
@@ -41,7 +35,7 @@ From the repository root:
 
 ```bash
 python scripts/lightcppgen_optimizer.py score \
-  --sequences GEPWKVCVN \
+  --sequences MILPTGPTSFKE \
   --output results/scored_sequences.csv
 ```
 
@@ -57,7 +51,7 @@ id,sequence,length,penetration_score,anomaly_score
 
 ```bash
 python scripts/lightcppgen_optimizer.py score \
-  --sequences GEPWKVCVN LDPIVAKRVRHILTENARTVEA \
+  --sequences MILPTGPTSFKE ESVVHRVFGRQSLYQRGLGV \
   --output results/scored_sequences.csv
 ```
 
@@ -73,9 +67,9 @@ Example FASTA:
 
 ```text
 >peptide_1
-GEPWKVCVN
+MILPTGPTSFKE
 >peptide_2
-LDPIVAKRVRHILTENARTVEA
+ESVVHRVFGRQSLYQRGLGV
 ```
 
 ### CSV
@@ -92,8 +86,8 @@ Example CSV:
 
 ```text
 ID,Sequence
-peptide_1,GEPWKVCVN
-peptide_2,LDPIVAKRVRHILTENARTVEA
+peptide_1,MILPTGPTSFKE
+peptide_2,ESVVHRVFGRQSLYQRGLGV
 ```
 
 ### Plain Text
@@ -145,7 +139,7 @@ The `optimize` command runs the genetic algorithm used by LightCPPgen around the
 
 ```bash
 python scripts/lightcppgen_optimizer.py optimize \
-  --sequences GEPWKVCVN \
+  --sequences MILPTGPTSFKE \
   --population-size 500 \
   --max-iter 50 \
   --output results/optimized_sequences.csv
@@ -155,7 +149,7 @@ For a quick functional test:
 
 ```bash
 python scripts/lightcppgen_optimizer.py optimize \
-  --sequences GEPWKVCVN \
+  --sequences MILPTGPTSFKE \
   --population-size 50 \
   --max-iter 5 \
   --output results/optimized_sequences_quick_test.csv
@@ -225,7 +219,7 @@ The optimization mode is stochastic. Use `--seed` to make repeated runs comparab
 
 ```bash
 python scripts/lightcppgen_optimizer.py optimize \
-  --sequences GEPWKVCVN \
+  --sequences MILPTGPTSFKE \
   --seed 42 \
   --output results/optimized_seed42.csv
 ```

@@ -164,25 +164,3 @@ Disadvantages:
 In principle, every candidate sequence could be passed through the full descriptor pipeline.
 
 This is usually not recommended for genetic optimization because thousands of candidates must be scored repeatedly. It is more appropriate for batch scoring than for iterative optimization.
-
-## Current Status
-
-The historical notebooks provide most of the required pieces, but this mode is not yet a polished command-line workflow.
-
-The next useful improvements are:
-
-```text
-scripts/create_custom_dataset_files.py
-scripts/train_lightcppgen_model.py
-scripts/check_feature_compatibility.py
-docs/CUSTOM_DATASET_PIPELINE.md expansion with a full worked example
-```
-
-The first custom-dataset milestone should be a reproducible small example that:
-
-1. reads a CSV with `ID`, `Sequence`, `CPP`;
-2. creates FASTA and label files;
-3. runs feature engineering;
-4. trains a LightGBM model;
-5. saves selected features and model metadata;
-6. reports whether the model is optimizer-compatible.

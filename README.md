@@ -28,7 +28,7 @@ Use the original MLCPP2.0 data and the notebooks in `notebooks/` to reproduce th
 - genetic-algorithm optimization
 - paper figures and supplementary analyses
 
-This is the historical reproduction workflow. Use Python 3.9 and the pinned dependencies in `requirements.txt`.
+This is the historical reproduction workflow. Use Python 3.9 and the dependencies in `requirements.txt`.
 
 ### 2. Custom Dataset Pipeline
 
@@ -56,15 +56,9 @@ See [Pretrained Optimizer Mode](docs/PRETRAINED_OPTIMIZER.md) for full usage ins
 The pretrained optimizer has a lighter dependency file:
 
 ```bash
-conda create -n lightcppgen-optimizer python=3.9
+conda create -n lightcppgen-optimizer
 conda activate lightcppgen-optimizer
 pip install -r requirements-optimizer.txt
-```
-
-For the exact tested lightweight environment:
-
-```bash
-pip install -r requirements-optimizer-pinned.txt
 ```
 
 ## Repository Layout
@@ -107,7 +101,7 @@ Score one or more sequences:
 
 ```bash
 python scripts/lightcppgen_optimizer.py score \
-  --sequences GEPWKVCVN LDPIVAKRVRHILTENARTVEA \
+  --sequences MILPTGPTSFKE ESVVHRVFGRQSLYQRGLGV \
   --output results/scored_sequences.csv
 ```
 
@@ -133,7 +127,7 @@ Run the genetic optimizer on one or more input sequences:
 
 ```bash
 python scripts/lightcppgen_optimizer.py optimize \
-  --sequences GEPWKVCVN \
+  --sequences MILPTGPTSFKE \
   --population-size 500 \
   --max-iter 50 \
   --output results/optimized_sequences.csv
@@ -143,7 +137,7 @@ For quick tests, use smaller values:
 
 ```bash
 python scripts/lightcppgen_optimizer.py optimize \
-  --sequences GEPWKVCVN \
+  --sequences MILPTGPTSFKE \
   --population-size 50 \
   --max-iter 5 \
   --output results/optimized_sequences_quick_test.csv
